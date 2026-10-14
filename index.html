@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Заявки не должны теряться — автоматизация для малого бизнеса</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f0;--surface:#fff;--ink:#10231f;--muted:#51655f;--line:#cfdad6;--accent:#2457f5;--accent-ink:#fff;--loss:#c2371a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1714;--surface:#14231f;--ink:#e8f1ee;--muted:#9bb0aa;--line:#26403a;--accent:#6c8cff;--accent-ink:#0d1714;--loss:#ff7a5c}}
+:root[data-theme="dark"]{--bg:#0d1714;--surface:#14231f;--ink:#e8f1ee;--muted:#9bb0aa;--line:#26403a;--accent:#6c8cff;--accent-ink:#0d1714;--loss:#ff7a5c}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Onest,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55}
+main{max-width:920px;margin:0 auto;padding:40px 20px 64px}
+h1{font-size:clamp(30px,6vw,52px);line-height:1.08;margin:0 0 14px;font-weight:800;letter-spacing:-.02em;max-width:18ch}
+h2{font-size:clamp(22px,4vw,30px);margin:56px 0 16px;font-weight:700;letter-spacing:-.01em}
+p{max-width:62ch;margin:0 0 14px}
+.lead{color:var(--muted);font-size:18px}
+.calc{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;margin-top:28px;display:grid;gap:22px;grid-template-columns:1fr 1fr}
+@media(max-width:700px){.calc{grid-template-columns:1fr}}
+.field{margin-bottom:18px}
+label{display:flex;justify-content:space-between;font-weight:500;margin-bottom:6px}
+label output{font-weight:700}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.result{display:flex;flex-direction:column;justify-content:center;border-left:1px solid var(--line);padding-left:22px}
+@media(max-width:700px){.result{border-left:0;border-top:1px solid var(--line);padding:18px 0 0}}
+.big{font-size:clamp(36px,8vw,56px);font-weight:800;color:var(--loss);line-height:1;margin:6px 0 10px}
+.small{color:var(--muted);font-size:15px}
+.rows{display:grid;gap:12px}
+.row{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.row b{display:block;margin-bottom:2px}
+.row span{color:var(--muted)}
+.plans{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+@media(max-width:760px){.plans{grid-template-columns:1fr}}
+.plan{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column}
+.plan.main{border:2px solid var(--accent)}
+.plan h3{margin:0 0 4px;font-size:20px}
+.price{font-size:28px;font-weight:800;margin:6px 0 12px}
+.plan ul{padding-left:18px;margin:0 0 16px;color:var(--muted)}
+.plan li{margin-bottom:6px}
+.btn{display:inline-block;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:700;padding:14px 22px;border-radius:10px;margin-top:auto;text-align:center}
+.btn:focus-visible,input:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.cta{margin-top:56px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:28px}
+.cta h2{margin-top:0}
+</style>
+</head>
+<body>
+<main>
+<h1>Сколько клиентов вы теряете, пока не отвечаете на заявки?</h1>
+<p class="lead">Клиент пишет в 22:40 или в разгар рабочего дня и уходит к тому, кто ответил первым. Посчитайте свои потери и посмотрите, как их закрывает автоматизация.</p>
+
+<section class="calc" aria-label="Калькулятор потерь">
+<div>
+<div class="field"><label for="leads">Заявок в день <output id="leadsO"></output></label><input id="leads" type="range" min="1" max="100" value="15"></div>
+<div class="field"><label for="check">Средний чек, ₽ <output id="checkO"></output></label><input id="check" type="range" min="500" max="100000" step="500" value="8000"></div>
+<div class="field"><label for="lost">Доля заявок без быстрого ответа, % <output id="lostO"></output></label><input id="lost" type="range" min="5" max="70" value="30"></div>
+</div>
+<div class="result" aria-live="polite">
+<div class="small">Вы теряете примерно в месяц</div>
+<div class="big" id="loss">0 ₽</div>
+<div class="small" id="gain"></div>
+</div>
+</section>
+
+<h2>Что я настраиваю</h2>
+<div class="rows">
+<div class="row"><b>Мгновенный ответ на заявку</b><span>Бот в Telegram, на сайте или в мессенджере отвечает за секунды, задаёт нужные вопросы и собирает контакты.</span></div>
+<div class="row"><b>Заявки в одной таблице или CRM</b><span>Каждое обращение попадает в таблицу с источником и статусом. Менеджер видит, кому перезвонить.</span></div>
+<div class="row"><b>Напоминания и дожим</b><span>Клиент не ответил или не оплатил: система напоминает ему сама и сообщает вам, если он молчит.</span></div>
+<div class="row"><b>Еженедельный отчёт</b><span>Сколько заявок пришло, сколько обработано, где теряются клиенты. Одним сообщением в понедельник.</span></div>
+</div>
+
+<h2>Стоимость</h2>
+<div class="plans">
+<div class="plan"><h3>Старт</h3><div class="price">40 000 ₽</div><ul><li>Бот или форма заявок</li><li>Выгрузка в таблицу</li><li>Уведомления вам в Telegram</li><li>Срок: 5–7 дней</li></ul><a class="btn" href="https://t.me/zayavki_auto_pro">Обсудить</a></div>
+<div class="plan main"><h3>Бизнес</h3><div class="price">80 000 ₽</div><ul><li>Всё из тарифа «Старт»</li><li>Интеграция с CRM</li><li>Напоминания и дожим клиентов</li><li>Срок: 10–14 дней</li></ul><a class="btn" href="https://t.me/zayavki_auto_pro">Обсудить</a></div>
+<div class="plan"><h3>Сопровождение</h3><div class="price">15 000 ₽ / мес</div><ul><li>Правки и доработки</li><li>Мониторинг, чтобы всё работало</li><li>Еженедельный отчёт</li><li>Можно подключить к любому тарифу</li></ul><a class="btn" href="https://t.me/zayavki_auto_pro">Обсудить</a></div>
+</div>
+
+<section class="cta">
+<h2>Разберём вашу ситуацию бесплатно</h2>
+<p>Напишите, чем занимаетесь и откуда приходят заявки. За 15 минут скажу, что можно автоматизировать и сколько это будет стоить.</p>
+<a class="btn" href="https://t.me/zayavki_auto_pro">Написать в Telegram</a>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('ru-RU').replace(/\u00a0/g,' ')+' ₽';
+function calc(){
+const l=+$('leads').value,c=+$('check').value,p=+$('lost').value;
+$('leadsO').textContent=l;$('checkO').textContent=fmt(c);$('lostO').textContent=p+'%';
+const loss=l*30*(p/100)*c*0.3; // 30% потерянных заявок обычно закрылись бы в продажу
+$('loss').textContent=fmt(loss);
+$('gain').textContent='Если вернуть хотя бы половину, это +'+fmt(loss/2)+' в месяц. Расчёт примерный: допускается, что 30% потерянных заявок закрылись бы в продажу.';
+}
+['leads','check','lost'].forEach(id=>$(id).addEventListener('input',calc));
+calc();
+</script>
+</body>
+</html>
